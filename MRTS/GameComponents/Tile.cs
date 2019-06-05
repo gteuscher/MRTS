@@ -3,7 +3,7 @@ using Microsoft.Xna.Framework.Graphics;
 
 namespace MRTS.GameComponents
 {
-    class Tile
+    public class Tile
     {
         public Texture2D TileTexture { get; set; }
         public int x { get; set; }

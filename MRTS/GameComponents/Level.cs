@@ -49,6 +49,7 @@ namespace MRTS.GameComponents
                     if (t.GetCoordinates().Contains(new Point(x, y)) && t.CurrentHealth == 0)
                     {
                         TileCollection[i, j] = new Tower(TowerGraphics, 100, i, j);
+                        TileCollection[i, j].CreateSpawnThread();
                     }
                 }
             }

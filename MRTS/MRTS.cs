@@ -43,23 +43,11 @@ namespace MRTS
         {
             // Create a new SpriteBatch, which can be used to draw textures.
             spriteBatch = new SpriteBatch(GraphicsDevice);
-            var towerGraphics = new List<Texture2D>();
+            var towerGraphics = GameFunctions.LoadContent("Tower", Content);
+            var unitGraphics = GameFunctions.LoadContent("Unit", Content);
 
-            try
-            {
-                DirectoryInfo dir = new DirectoryInfo(Content.RootDirectory + "\\Tower\\" );
-                FileInfo[] files = dir.GetFiles("*.*");
-                foreach (FileInfo file in files)
-                {
-                    var tempName = (Path.GetFileNameWithoutExtension(file.Name));
-                    towerGraphics.Add(Content.Load<Texture2D>("Tower/" + Path.GetFileNameWithoutExtension(file.Name)));
-                }
-            }
-            catch (Exception e)
-            {
-                throw new Exception("Failed to load image content", e);
-            }
             level = new Level(10, 6, towerGraphics);
+            Army.Instance.AddUnitTexture(unitGraphics);
 
         }
 
@@ -96,6 +84,7 @@ namespace MRTS
             GraphicsDevice.Clear(Color.Gray);
             spriteBatch.Begin();
             level.Draw(spriteBatch);
+            Army.Instance.Draw(spriteBatch);
             spriteBatch.End();
             base.Draw(gameTime);
         }
