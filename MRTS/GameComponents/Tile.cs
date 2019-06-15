@@ -1,25 +1,18 @@
-﻿using Microsoft.Xna.Framework;
+﻿using System.Collections.Generic;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
 namespace MRTS.GameComponents
 {
-    public class Tile
+    public class Tile : GameObject
     {
-        public Texture2D TileTexture { get; set; }
-        public int x { get; set; }
-        public int y { get; set; }
-        public int Size { get; set; } = 128;
+        private const int SIZE  = 128;
 
-        public Tile(Texture2D t, int x, int y)
+        public Tile(Texture2D texture, int posX, int posY)
         {
-            TileTexture = t;
-            this.x = x;
-            this.y = y;
-        }
-
-        public Rectangle GetCoordinates()
-        {
-            return new Rectangle(x*Size, y*Size, Size, Size);
+            Graphics = new List<Texture2D> { texture };
+            Position = new Point(posX, posY);
+            Dimensions = new Point(SIZE, SIZE);
         }
     }
 }

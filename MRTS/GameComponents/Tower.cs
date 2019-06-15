@@ -1,26 +1,24 @@
-﻿using System;
-using System.Threading;
+﻿using System.Threading;
 using Microsoft.Xna.Framework.Graphics;
 using System.Collections.Generic;
+using Microsoft.Xna.Framework;
 
 namespace MRTS.GameComponents
 {
-    public class Tower : Tile
+    public class Tower : GameObject
     {
         //[0] is default texture [1] is damage texture, [2] is destroyed texture
-        private List<Texture2D> TowerGraphics;
-        public int StartingHealth{ get; set; }
-        public int CurrentHealth { get; set; }
-        public int SpawnRate { get; set; }
         AutoResetEvent autoEvent = new AutoResetEvent(false);
 
-        public Tower(Texture2D tileTexture, int x, int y): base (tileTexture, x, y)
+        public Tower(Texture2D texture, int posX, int posY)
         {
+            Graphics = new List<Texture2D> { texture };
+            Position = new Point(posX, posY);
         }
 
-        public Tower(List<Texture2D> towerGraphics, int startingHealth, int x, int y, int spawnRate = 3000): base (towerGraphics[1], x, y)
+        public Tower(List<Texture2D> towerGraphics, int startingHealth, int x, int y, int spawnRate = 3000)
         {
-            TowerGraphics = towerGraphics;
+            Graphics = towerGraphics;
             StartingHealth = startingHealth;
             CurrentHealth = startingHealth;
             SpawnRate = spawnRate;
@@ -28,22 +26,14 @@ namespace MRTS.GameComponents
 
         public int Damage(int damageDealt)
         {
-            if (CurrentHealth <= damageDealt)
-            {
-                TileTexture = TowerGraphics[3];
-            }
-            else
-            {
-                TileTexture = TowerGraphics[2];
-            }
-            
+            GraphicIndex = CurrentHealth <= damageDealt ? 3 : 2;
+
             return CurrentHealth -= damageDealt;
         }
 
         public void CreateSpawnThread()
         {
-
-            var unitSpawner = new Thread(new ThreadStart(SpawnUnits));
+            var unitSpawner = new Thread(SpawnUnits);
             unitSpawner.IsBackground = true;
             unitSpawner.Start();
         }
@@ -51,10 +41,8 @@ namespace MRTS.GameComponents
         private void SpawnUnits()
         {
             Thread.Sleep(SpawnRate);
-            Army.Instance.AddUnit((x*Size)+(Size/2), (y*Size)+(Size/2));
+            Army.Instance.AddUnit( Position.X * Dimensions.X + Dimensions.X / 2 , Position.Y * Dimensions.Y + Dimensions.Y/2 );
             CreateSpawnThread();
         }
-
-      
     }
 }

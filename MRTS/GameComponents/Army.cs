@@ -10,6 +10,10 @@ namespace MRTS.GameComponents
         public List<Unit> UnitCollection = new List<Unit>();
         private static readonly Army instance = new Army();
 
+        public Army()
+        {
+        }
+
         public static Army Instance
         {
             get { return instance; }
@@ -18,9 +22,9 @@ namespace MRTS.GameComponents
 
         public void Draw(SpriteBatch s)
         {
-            foreach (Unit u in UnitCollection)
+            foreach (var unit in UnitCollection)
             {
-                s.Draw(u.UnitTexture, new Vector2(u.SpawnX, u.SpawnY), Color.White);
+                s.Draw(unit.UnitTexture, new Vector2(unit.SpawnX, unit.SpawnY), Color.White);
             }
         }
 

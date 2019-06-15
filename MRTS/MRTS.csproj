@@ -42,6 +42,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="GameComponents\Army.cs" />
+    <Compile Include="GameComponents\GameObject.cs" />
     <Compile Include="GameComponents\Unit.cs" />
     <Compile Include="GameFunctions.cs" />
     <Compile Include="MRTS.cs" />
