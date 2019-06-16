@@ -1,13 +1,15 @@
-﻿using Microsoft.Xna.Framework;
+﻿using System.Collections.Concurrent;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace MRTS.GameComponents
 {
     public sealed class Army
     {
         public List<Texture2D> UnitTexture;
-        public List<Unit> UnitCollection = new List<Unit>();
+        public ConcurrentBag<Unit> UnitCollection = new ConcurrentBag<Unit>();
         private static readonly Army instance = new Army();
 
         public Army()
@@ -41,7 +43,7 @@ namespace MRTS.GameComponents
 
         public List<Unit> GetUnits()
         {
-            return UnitCollection;
+            return UnitCollection.ToList();
         }
     }
 }

@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
@@ -6,7 +7,7 @@ namespace MRTS.GameComponents
 {
     public class Tile : GameObject
     {
-        private const int SIZE  = 128;
+        public const int SIZE  = 128;
 
         public Tile(Texture2D texture, int posX, int posY)
         {

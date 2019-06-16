@@ -7,55 +7,51 @@ namespace MRTS.GameComponents
 {
     public class Level
     {
-        public Tower[,] TileCollection { get; set; }
+        public List<GameObject> GameObjects { get; set; }
+        public Army Army { get; set; }
         private List<Texture2D> TowerGraphics;
+        private Texture2D TileGraphic;
+        private Point Dimensions { get; set; }
 
-        public Level(int x, int y, List<Texture2D> towerGraphics)
+        public Level(int x, int y, List<Texture2D> towerGraphics, Texture2D tileGraphic)
         {
-            TileCollection = new Tower[x, y];
+            Dimensions = new Point(x, y);
+            GameObjects = new List<GameObject>();
             TowerGraphics = towerGraphics;
+            TileGraphic = tileGraphic;
             Initialize();
         }
 
         public void Initialize()
         {
-            for(var i = 0; i < TileCollection.GetLength(0); i++)
+            Army = new Army();
+            
+            for(var x = 0; x < Dimensions.X; x++)
             {
-                for (var j = 0; j < TileCollection.GetLength(1); j++)
+                for (var y = 0; y < Dimensions.Y; y++)
                 {
-                    var graphic = TowerGraphics.FirstOrDefault();
-                    if (graphic != null)
-                    {
-                        TileCollection[i, j] = new Tower(graphic, i, j);
-                    }
+                    GameObjects.Add(new Tile(TileGraphic, Tile.SIZE * x, Tile.SIZE * y));
                 }
             }
         }
 
         public void Draw(SpriteBatch s)
         {
-            for (var i = 0; i < TileCollection.GetLength(0); i++)
+            GameObjects.ForEach(go =>
             {
-                for (var j = 0; j < TileCollection.GetLength(1); j++)
-                {
-                    var t = TileCollection[i, j];
-                    s.Draw(t.Graphics[t.GraphicIndex], new Vector2(i * t.Dimensions.X, j * t.Dimensions.Y), Color.White);
-                }
-            }
+                s.Draw(go.CurrentGraphic, new Vector2(go.Position.X, go.Position.Y),
+                    Color.White);
+            });
+
         }
 
         public void Update(GameTime g, int x, int y)
         {
-            for (var i = 0; i < TileCollection.GetLength(0); i++)
+            var quadrant = GameObjects.GetTiles().FirstOrDefault(t => t.Coordinates.Contains(new Point(x, y)));
+            // TODO Null check on quadrant is a hack. Only trigger update if mouseclick was in game window
+            if (quadrant != null && !GameObjects.GetTowers().Any(t => t.Coordinates.Contains(new Point(x, y)) && t.CurrentHealth == 0))
             {
-                for (var j = 0; j < TileCollection.GetLength(1); j++)
-                {
-                    var t = TileCollection[i, j];
-                    if (t.Coordinates.Contains(new Point(x, y)) && t.CurrentHealth == 0)
-                    {
-                        TileCollection[i, j] = new Tower(TowerGraphics, 100, i, j);
-                    }
-                }
+                GameObjects.Add(new Tower(TowerGraphics, 100, quadrant.Position.X, quadrant.Position.Y));
             }
         }
     }

@@ -6,6 +6,7 @@ using MRTS.GameComponents;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 
 namespace MRTS
 {
@@ -44,9 +45,15 @@ namespace MRTS
             // Create a new SpriteBatch, which can be used to draw textures.
             spriteBatch = new SpriteBatch(GraphicsDevice);
             var towerGraphics = GameFunctions.LoadContent("Tower", Content);
+
+            // TODO: Fix hack once I can edit content mgcb
+            var tileGraphic = towerGraphics.FirstOrDefault();
+            towerGraphics = towerGraphics.Skip(1).ToList();
+
+
             var unitGraphics = GameFunctions.LoadContent("Unit", Content);
 
-            level = new Level(10, 6, towerGraphics);
+            level = new Level(10, 6, towerGraphics, tileGraphic);
             Army.Instance.AddUnitTexture(unitGraphics);
 
         }

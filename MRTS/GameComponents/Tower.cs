@@ -2,6 +2,7 @@
 using System.Threading;
 using Microsoft.Xna.Framework.Graphics;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Xna.Framework;
 
@@ -33,11 +34,23 @@ namespace MRTS.GameComponents
             StartActionLoop();
         }
 
+        public new Texture2D CurrentGraphic => CurrentHealth / StartingHealth > (2 / 3)
+            ? Graphics.FirstOrDefault()
+            : CurrentHealth / StartingHealth > (1 / 3)
+                ? Graphics.ElementAtOrDefault(1) ?? Graphics.FirstOrDefault()
+                : Graphics.ElementAtOrDefault(2) ?? Graphics.FirstOrDefault();
+
         public int Damage(int damageDealt)
         {
-            GraphicIndex = CurrentHealth <= damageDealt ? 3 : 2;
-
             return CurrentHealth -= damageDealt;
+        }
+
+        private void SpawnUnit()
+        {
+            var random = new Random();
+            var xPos = Position.X + random.Next(Dimensions.X);
+            var yPos = Position.Y + random.Next(Dimensions.Y);
+            Army.Instance.AddUnit(xPos, yPos);
         }
 
         public void StartActionLoop()
@@ -46,10 +59,7 @@ namespace MRTS.GameComponents
                 while (true)
                 {
                     Thread.Sleep(SpawnRate);
-                    var random = new Random();
-                    var xPos = Position.X * Dimensions.X + random.Next(Dimensions.X);
-                    var yPos = Position.Y * Dimensions.Y + random.Next(Dimensions.Y);
-                    Army.Instance.AddUnit(xPos, yPos);
+                    SpawnUnit();
                 }
             });
         }
