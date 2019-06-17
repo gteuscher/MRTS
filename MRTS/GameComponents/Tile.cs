@@ -11,7 +11,7 @@ namespace MRTS.GameComponents
 
         public Tile(Texture2D texture, int posX, int posY)
         {
-            Graphics = new List<Texture2D> { texture };
+            Textures = new List<Texture2D> { texture };
             Position = new Point(posX, posY);
             Dimensions = new Point(SIZE, SIZE);
         }

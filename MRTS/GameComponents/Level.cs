@@ -1,13 +1,16 @@
-﻿using Microsoft.Xna.Framework;
+﻿using System;
+using System.Collections.Concurrent;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace MRTS.GameComponents
 {
     public class Level
     {
-        public List<GameObject> GameObjects { get; set; }
+        public ConcurrentBag<GameObject> GameObjects { get; set; }
         public Army Army { get; set; }
         private List<Texture2D> TowerGraphics;
         private Texture2D TileGraphic;
@@ -16,7 +19,7 @@ namespace MRTS.GameComponents
         public Level(int x, int y, List<Texture2D> towerGraphics, Texture2D tileGraphic)
         {
             Dimensions = new Point(x, y);
-            GameObjects = new List<GameObject>();
+            GameObjects = new ConcurrentBag<GameObject>();
             TowerGraphics = towerGraphics;
             TileGraphic = tileGraphic;
             Initialize();
@@ -37,7 +40,7 @@ namespace MRTS.GameComponents
 
         public void Draw(SpriteBatch s)
         {
-            GameObjects.ForEach(go =>
+            GameObjects.ToList().ForEach(go =>
             {
                 s.Draw(go.CurrentGraphic, new Vector2(go.Position.X, go.Position.Y),
                     Color.White);
@@ -53,6 +56,19 @@ namespace MRTS.GameComponents
             {
                 GameObjects.Add(new Tower(TowerGraphics, 100, quadrant.Position.X, quadrant.Position.Y));
             }
+        }
+
+        private async Task SpawnUnit(GameObject gameObject)
+        {
+            var random = new Random();
+            var xPos = gameObject.Position.X + random.Next(Dimensions.X);
+            var yPos = gameObject.Position.Y + random.Next(Dimensions.Y);
+            var army = Army.Instance;
+            lock (army)
+            {
+                army.AddUnit(xPos, yPos);
+            }
+            await Task.Delay(gameObject.SpawnRate);
         }
     }
 }

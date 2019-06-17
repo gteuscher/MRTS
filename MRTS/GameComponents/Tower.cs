@@ -14,16 +14,9 @@ namespace MRTS.GameComponents
         AutoResetEvent autoEvent = new AutoResetEvent(false);
         private const int SIZE = 128;
 
-        public Tower(Texture2D texture, int posX, int posY)
+        public Tower(List<Texture2D> towerTextures, int startingHealth, int x, int y, int spawnRate = 3000)
         {
-            Graphics = new List<Texture2D> { texture };
-            Position = new Point(posX, posY);
-            Dimensions = new Point(SIZE, SIZE);
-        }
-
-        public Tower(List<Texture2D> towerGraphics, int startingHealth, int x, int y, int spawnRate = 3000)
-        {
-            Graphics = towerGraphics;
+            Textures = towerTextures;
             GraphicIndex = 1;
             StartingHealth = startingHealth;
             CurrentHealth = startingHealth;
@@ -31,38 +24,41 @@ namespace MRTS.GameComponents
             Position = new Point(x, y);
             Dimensions = new Point(SIZE, SIZE);
 
-            StartActionLoop();
+            Task.Run(() => StartActionLoop());
         }
 
         public new Texture2D CurrentGraphic => CurrentHealth / StartingHealth > (2 / 3)
-            ? Graphics.FirstOrDefault()
+            ? Textures.FirstOrDefault()
             : CurrentHealth / StartingHealth > (1 / 3)
-                ? Graphics.ElementAtOrDefault(1) ?? Graphics.FirstOrDefault()
-                : Graphics.ElementAtOrDefault(2) ?? Graphics.FirstOrDefault();
+                ? Textures.ElementAtOrDefault(1) ?? Textures.FirstOrDefault()
+                : Textures.ElementAtOrDefault(2) ?? Textures.FirstOrDefault();
 
         public int Damage(int damageDealt)
         {
             return CurrentHealth -= damageDealt;
         }
 
-        private void SpawnUnit()
+        private async Task SpawnUnit()
         {
             var random = new Random();
             var xPos = Position.X + random.Next(Dimensions.X);
             var yPos = Position.Y + random.Next(Dimensions.Y);
-            Army.Instance.AddUnit(xPos, yPos);
+            var army = Army.Instance;
+            lock (army)
+            {
+                army.AddUnit(xPos, yPos);
+            }
+            await Task.Delay(SpawnRate);
         }
 
-        public void StartActionLoop()
+        public async Task StartActionLoop()
         {
-            Task.Run(() => {
-                while (true)
+            await Task.Run( async () => {
+                while (CurrentHealth > 0)
                 {
-                    Thread.Sleep(SpawnRate);
-                    SpawnUnit();
+                    await SpawnUnit();
                 }
             });
         }
-
     }
 }

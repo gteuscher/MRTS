@@ -8,7 +8,7 @@ namespace MRTS.GameComponents
 {
     public sealed class Army
     {
-        public List<Texture2D> UnitTexture;
+        public List<Texture2D> UnitTextures;
         public ConcurrentBag<Unit> UnitCollection = new ConcurrentBag<Unit>();
         private static readonly Army instance = new Army();
 
@@ -26,18 +26,18 @@ namespace MRTS.GameComponents
         {
             foreach (var unit in UnitCollection)
             {
-                s.Draw(unit.UnitTexture, new Vector2(unit.SpawnX, unit.SpawnY), Color.White);
+                s.Draw(unit.Textures.FirstOrDefault(), new Vector2(unit.Position.X, unit.Position.Y), Color.White);
             }
         }
 
-        public void AddUnitTexture(List<Texture2D> unitTexture)
+        public void AddUnitTexture(List<Texture2D> unitTextures)
         {
-            UnitTexture = unitTexture;
+            UnitTextures = unitTextures;
         }
 
         public void AddUnit(int x, int y)
         {
-            var u = new Unit(UnitTexture[0], x, y);
+            var u = new Unit(UnitTextures[0], x, y);
             UnitCollection.Add(u);
         }
 
