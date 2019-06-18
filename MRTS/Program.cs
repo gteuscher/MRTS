@@ -14,8 +14,11 @@ namespace MRTS
         [STAThread]
         static void Main()
         {
+
             using (var game = new MRTS())
+            {
                 game.Run();
+            }
         }
     }
 #endif

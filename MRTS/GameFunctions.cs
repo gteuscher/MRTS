@@ -1,5 +1,4 @@
-﻿using System.Collections.Concurrent;
-using Microsoft.Xna.Framework.Graphics;
+﻿using Microsoft.Xna.Framework.Graphics;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -23,12 +22,12 @@ namespace MRTS
             return contentList;
         }
 
-        public static IEnumerable<GameObject> GetTiles(this ConcurrentBag<GameObject> list)
+        public static IEnumerable<GameObject> GetTiles(this List<GameObject> list)
         {
             return list.Where(t => t.GetType() == typeof(Tile));
         }
 
-        public static IEnumerable<GameObject> GetTowers(this ConcurrentBag<GameObject> list)
+        public static IEnumerable<GameObject> GetTowers(this List<GameObject> list)
         {
             return list.Where(t => t.GetType() == typeof(Tower));
         }

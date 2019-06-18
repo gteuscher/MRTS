@@ -10,17 +10,11 @@ namespace MRTS.GameComponents
     {
         public List<Texture2D> UnitTextures;
         public ConcurrentBag<Unit> UnitCollection = new ConcurrentBag<Unit>();
-        private static readonly Army instance = new Army();
 
-        public Army()
+        public Army(List<Texture2D> unitTextures )
         {
+            UnitTextures = unitTextures;
         }
-
-        public static Army Instance
-        {
-            get { return instance; }
-        }
-
 
         public void Draw(SpriteBatch s)
         {

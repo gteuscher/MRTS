@@ -13,6 +13,9 @@ namespace MRTS.GameComponents
         //[0] is default texture [1] is damage texture, [2] is destroyed texture
         AutoResetEvent autoEvent = new AutoResetEvent(false);
         private const int SIZE = 128;
+        public double LastSpawnTime = 0;
+
+        public double NextSpawnTime => LastSpawnTime + SpawnRate;
 
         public Tower(List<Texture2D> towerTextures, int startingHealth, int x, int y, int spawnRate = 3000)
         {
@@ -23,8 +26,6 @@ namespace MRTS.GameComponents
             SpawnRate = spawnRate;
             Position = new Point(x, y);
             Dimensions = new Point(SIZE, SIZE);
-
-            Task.Run(() => StartActionLoop());
         }
 
         public new Texture2D CurrentGraphic => CurrentHealth / StartingHealth > (2 / 3)
@@ -38,27 +39,16 @@ namespace MRTS.GameComponents
             return CurrentHealth -= damageDealt;
         }
 
-        private async Task SpawnUnit()
+
+        public void SpawnUnit()
         {
             var random = new Random();
             var xPos = Position.X + random.Next(Dimensions.X);
             var yPos = Position.Y + random.Next(Dimensions.Y);
-            var army = Army.Instance;
-            lock (army)
+            lock (GameManager.Army)
             {
-                army.AddUnit(xPos, yPos);
+                GameManager.Army.AddUnit(xPos, yPos);
             }
-            await Task.Delay(SpawnRate);
-        }
-
-        public async Task StartActionLoop()
-        {
-            await Task.Run( async () => {
-                while (CurrentHealth > 0)
-                {
-                    await SpawnUnit();
-                }
-            });
         }
     }
 }

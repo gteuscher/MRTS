@@ -3,10 +3,8 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using MRTS.GameComponents;
-using System;
-using System.Collections.Generic;
-using System.IO;
 using System.Linq;
+using Microsoft.Xna.Framework.Content;
 
 namespace MRTS
 {
@@ -15,6 +13,9 @@ namespace MRTS
         GraphicsDeviceManager graphics;
         SpriteBatch spriteBatch;
         Level level;
+        GameManager GameManager;
+
+        private MouseState LastMouseState;
 
         public MRTS()
         {
@@ -33,6 +34,12 @@ namespace MRTS
         protected override void Initialize()
         {
             IsMouseVisible = true;
+            GameServices.AddService<GraphicsDevice>(GraphicsDevice);
+            GameServices.AddService<ContentManager>(Content);
+
+            GameManager = new GameManager();
+            GameServices.AddService<GameManager>(GameManager);
+            LastMouseState = Mouse.GetState();
             base.Initialize();
         }
 
@@ -44,18 +51,7 @@ namespace MRTS
         {
             // Create a new SpriteBatch, which can be used to draw textures.
             spriteBatch = new SpriteBatch(GraphicsDevice);
-            var towerGraphics = GameFunctions.LoadContent("Tower", Content);
-
-            // TODO: Fix hack once I can edit content mgcb
-            var tileGraphic = towerGraphics.FirstOrDefault();
-            towerGraphics = towerGraphics.Skip(1).ToList();
-
-
-            var unitGraphics = GameFunctions.LoadContent("Unit", Content);
-
-            level = new Level(10, 6, towerGraphics, tileGraphic);
-            Army.Instance.AddUnitTexture(unitGraphics);
-
+            GameManager.InitializeLevel();
         }
 
         /// <summary>
@@ -74,11 +70,18 @@ namespace MRTS
         /// <param name="gameTime">Provides a snapshot of timing values.</param>
         protected override void Update(GameTime gameTime)
         {
+            GameManager.RegisterTimeElapsed(gameTime);
+
             var mouseState = Mouse.GetState();
-            if (mouseState.LeftButton == ButtonState.Pressed)
+
+            if (LastMouseState.LeftButton == ButtonState.Released
+                && mouseState.LeftButton == ButtonState.Pressed)
             {
-                level.Update(gameTime, mouseState.Position.X, mouseState.Position.Y);
+                GameManager.RegisterMouseClick(mouseState.Position.X, mouseState.Position.Y);
             }
+
+            LastMouseState = Mouse.GetState();
+
             base.Update(gameTime);
         }
 
@@ -90,8 +93,7 @@ namespace MRTS
         {
             GraphicsDevice.Clear(Color.Gray);
             spriteBatch.Begin();
-            level.Draw(spriteBatch);
-            Army.Instance.Draw(spriteBatch);
+            GameManager.Draw(spriteBatch);
             spriteBatch.End();
             base.Draw(gameTime);
         }
